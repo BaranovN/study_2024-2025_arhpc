@@ -1,0 +1,55 @@
+%include 'in_out.asm'
+
+section .data
+    msg_x db 'Введите значение x: ', 0
+    msg_a db 'Введите значение a: ', 0
+    msg_res db 'Результат: ', 0
+
+section .bss
+    x resd 1           ; Буфер для хранения значения x (1 слово)
+    a resd 1           ; Буфер для хранения значения a (1 слово)
+    res resd 1         ; Буфер для хранения результата (1 слово)
+
+section .text
+    global _start
+
+_start:
+    ; Ввод значения x
+    mov eax, msg_x
+    call sprint          ; Выводим сообщение
+    call sread          ; Считываем строку в буфер x
+    call atoi           ; Преобразуем строку в целое число
+    mov [x], eax        ; Сохраняем значение x
+
+    ; Ввод значения a
+    mov r, msg_a
+    call sprint          ; Выводим сообщение
+    call sread          ; Считываем строку в буфер a
+    call atoi           ; Преобразуем строку в целое число
+    mov [a], eax        ; Сохраняем значение a
+
+    ; Сравнение значений x и a
+    mov eax, [x]
+    cmp eax, [a]
+    jg _func            ; Если x > a, переходим к _func
+
+    ; Если x <= a, то результат = 15
+    mov eax, 15
+    mov [res], eax      ; Сохраняем результат
+    jmp _result
+
+_func:
+    ; Если x > a, выполняем (x - a) * 2
+    mov eax, [x]
+    sub eax, [a]
+    shl eax, 1          ; Умножаем на 2
+    mov [res], eax      ; Сохраняем результат
+
+_result:
+    ; Вывод результата
+    mov rax, msg_res
+    call sprint          ; Выводим сообщение о результате
+    mov eax, [res]      ; Загружаем результат
+     ; Преобразуем результат в строку для вывода
+    call iprintLF       ; Печатаем результат
+    call quit           ; Завершаем программу
